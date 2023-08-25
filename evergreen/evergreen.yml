@@ -47,7 +47,7 @@ functions:
            fi
 
            echo "$PACKAGE_VERSION_MATCH"
-           if [ -n $PACKAGE_VERSION_MATCH ]; then
+           if [[ -n $PACKAGE_VERSION_MATCH ]]; then
               PACKAGE_VERSION=$(git describe --tags --abbrev=0 --match="$PACKAGE_VERSION_MATCH" --exclude="$PACKAGE_VERSION_EXCLUDE")
               echo $PACKAGE_VERSION
               PACKAGE_VERSION=${PACKAGE_VERSION:1}
