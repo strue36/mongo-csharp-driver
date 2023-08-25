@@ -46,6 +46,14 @@ functions:
               CURRENT_VERSION=latest
            fi
 
+           echo "$PACKAGE_VERSION_MATCH"
+           if [ -n $PACKAGE_VERSION_MATCH ]
+              PACKAGE_VERSION=$(git describe --tags --abbrev=0 --match="$PACKAGE_VERSION_MATCH" --exclude="$PACKAGE_VERSION_EXCLUDE")
+              echo $PACKAGE_VERSION
+              PACKAGE_VERSION=${PACKAGE_VERSION:1}
+              echo $PACKAGE_VERSION
+           fi
+
            export DRIVERS_TOOLS="$(pwd)/../drivers-tools"
 
            if [ "Windows_NT" = "$OS" ]; then # Magic variable in cygwin
@@ -68,6 +76,7 @@ functions:
            MONGODB_BINARIES: "$MONGODB_BINARIES"
            UPLOAD_BUCKET: "$UPLOAD_BUCKET"
            PROJECT_DIRECTORY: "$PROJECT_DIRECTORY"
+           PACKAGE_VERSION="$PACKAGE_VERSION"
            PREPARE_SHELL: |
               set -o errexit
               set -o xtrace
@@ -76,6 +85,7 @@ functions:
               export MONGODB_BINARIES="$MONGODB_BINARIES"
               export UPLOAD_BUCKET="$UPLOAD_BUCKET"
               export PROJECT_DIRECTORY="$PROJECT_DIRECTORY"
+              export PACKAGE_VERSION="$PACKAGE_VERSION"
 
               export TMPDIR="$MONGO_ORCHESTRATION_HOME/db"
               export PATH="$MONGODB_BINARIES:$PATH"
@@ -103,6 +113,15 @@ functions:
     - command: expansions.update
       params:
         file: mongo-csharp-driver/expansion.yml
+
+  install-dotnet:
+    - command: shell.exec
+      params:
+        script: |
+          ${PREPARE_SHELL}
+          OS=${OS} \
+            ${PROJECT_DIRECTORY}/evergreen/install-dotnet.sh
+
 
   prepare-resources:
     - command: shell.exec
@@ -1013,6 +1032,54 @@ functions:
           ${PREPARE_SHELL}
           echo '{"results": [{ "status": "FAIL", "test_file": "Build", "log_raw": "No test-results.json found was created" } ]}' > ${PROJECT_DIRECTORY}/test-results.json
 
+
+  package-pack:
+    - command: shell.exec
+      params:
+        working_dir: mongo-csharp-driver
+        script: |
+          ${PREPARE_SHELL}
+          if [ -z ${PACKAGE_VERSION} ]
+            exit 1
+          fi
+          OS=${OS} PACKAGE_VERSION=${PACKAGE_VERSION} sh evergreen/run-pack.sh
+
+  upload-package:
+    - command: s3.put
+      params:
+        aws_key: ${aws_key}
+        aws_secret: ${aws_secret}
+        local_file: ${PROJECT_DIRECTORY}/build/nuget/${PACKAGE_ID}.${PACKAGE_VERSION}.nupkg
+        remote_file: ${UPLOAD_BUCKET}/${revision}/${PACKAGE_ID}.${PACKAGE_VERSION}.nupkg
+        bucket: mciuploads
+        permissions: public-read
+        content_type: ${content_type|application/octet-stream}
+    - command: s3.put
+      params:
+        aws_key: ${aws_key}
+        aws_secret: ${aws_secret}
+        local_file: ${PROJECT_DIRECTORY}/build/nuget/${PACKAGE_ID}.${PACKAGE_VERSION}.snupkg
+        remote_file: ${UPLOAD_BUCKET}/${revision}/${PACKAGE_ID}.${PACKAGE_VERSION}.snupkg
+        bucket: mciuploads
+        permissions: public-read
+        content_type: ${content_type|application/octet-stream}
+
+  download-package:
+    - command: s3.get
+      params:
+        aws_key: ${aws_key}
+        aws_secret: ${aws_secret}
+        local_file: ${PROJECT_DIRECTORY}/build/nuget/${PACKAGE_ID}.${PACKAGE_VERSION}.nupkg
+        remote_file: ${UPLOAD_BUCKET}/${revision}/${PACKAGE_ID}.${PACKAGE_VERSION}.nupkg
+        bucket: mciuploads
+    - command: s3.get
+      params:
+        aws_key: ${aws_key}
+        aws_secret: ${aws_secret}
+        local_file: ${PROJECT_DIRECTORY}/build/nuget/${PACKAGE_ID}.${PACKAGE_VERSION}.snupkg
+        remote_file: ${UPLOAD_BUCKET}/${revision}/${PACKAGE_ID}.${PACKAGE_VERSION}.snupkg
+        bucket: mciuploads
+
 pre:
   - func: fetch-source
   - func: prepare-resources
@@ -1666,6 +1733,25 @@ tasks:
               export GCPKMS_INSTANCENAME=${GCPKMS_INSTANCENAME}
               GCPKMS_CMD="MONGODB_URI='mongodb://localhost:27017' ./evergreen/run-csfle-gcp-tests.sh" $DRIVERS_TOOLS/.evergreen/csfle/gcpkms/run-command.sh
 
+    - name: package-pack
+      commands:
+      - func: package-pack
+      - func: upload-package
+        vars:
+          PACKAGE_ID: "MongoDB.Bson"
+      - func: upload-package
+        vars:
+          PACKAGE_ID: "MongoDB.Driver"
+      - func: upload-package
+        vars:
+          PACKAGE_ID: "MongoDB.Driver.Core"
+      - func: upload-package
+        vars:
+          PACKAGE_ID: "MongoDB.Driver.GridFS"
+      - func: upload-package
+        vars:
+          PACKAGE_ID: "mongocsharpdriver"
+
 axes:
   - id: version
     display_name: MongoDB Version
@@ -1886,6 +1972,16 @@ task_groups:
             $DRIVERS_TOOLS/.evergreen/csfle/gcpkms/delete-instance.sh
     tasks:
       - test-csfle-with-gcp-kms
+
+  - name: dev-package
+    setup_group:
+      - func: install-dotnet
+      - func: fetch-source
+        vars:
+          PACKAGE_VERSION_MATCH: "v[0-9]*.[0-9]*.[0-9]*-dev[0-9]*"
+          PACKAGE_VERSION_EXCLUDE: ""
+    tasks:
+      - package-pack
 
 buildvariants:
 
@@ -2190,3 +2286,10 @@ buildvariants:
     - name: test-smoke-tests-netcoreapp31
     - name: test-smoke-tests-net50
     - name: test-smoke-tests-net60
+
+- name: dev-package-pack
+  git_tag_only: true
+  display_name: "Dev Package Pack"
+  run_on: ubuntu1804-small
+  tasks:
+    - name: dev-package
