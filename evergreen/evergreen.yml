@@ -116,8 +116,7 @@ functions:
       params:
         script: |
           ${PREPARE_SHELL}
-          OS=${OS} \
-            ${PROJECT_DIRECTORY}/evergreen/install-dotnet.sh
+          OS="${OS}" sh ${PROJECT_DIRECTORY}/evergreen/install-dotnet.sh
 
 
   prepare-resources:
@@ -1039,7 +1038,7 @@ functions:
           if [ "${PACKAGE_VERSION}" == "" ]; then
             exit 1
           fi
-          OS=${OS} PACKAGE_VERSION=${PACKAGE_VERSION} sh evergreen/run-pack.sh
+          PACKAGE_VERSION="${PACKAGE_VERSION}" sh evergreen/run-pack.sh
 
   upload-package:
     - command: s3.put
