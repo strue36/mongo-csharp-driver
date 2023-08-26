@@ -1973,16 +1973,6 @@ task_groups:
     tasks:
       - test-csfle-with-gcp-kms
 
-  - name: dev-package
-    setup_group:
-      - func: install-dotnet
-      - func: fetch-source
-        vars:
-          PACKAGE_VERSION_MATCH: "v[0-9]*.[0-9]*.[0-9]*-dev[0-9]*"
-          PACKAGE_VERSION_EXCLUDE: ""
-    tasks:
-      - package-pack
-
 buildvariants:
 
 - matrix_name: "secure-tests"
@@ -2294,3 +2284,12 @@ buildvariants:
   tags: ["dev-package"]
   tasks:
     - name: dev-package
+      task_group:
+        setup_group:
+          - func: install-dotnet
+          - func: fetch-source
+            vars:
+              PACKAGE_VERSION_MATCH: "v[0-9]*.[0-9]*.[0-9]*-dev[0-9]*"
+              PACKAGE_VERSION_EXCLUDE: ""
+        tasks:
+          - package-pack
