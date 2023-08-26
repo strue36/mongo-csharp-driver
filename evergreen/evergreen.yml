@@ -46,7 +46,7 @@ functions:
               CURRENT_VERSION=latest
            fi
 
-           if [ "${PACKAGE_VERSION_MATCH}" != "" ]; then
+           if [[ -n $PACKAGE_VERSION_MATCH ]]; then
               PACKAGE_VERSION=$(git describe --tags --abbrev=0 --match="${PACKAGE_VERSION_MATCH}" --exclude="${PACKAGE_VERSION_EXCLUDE}")
            fi
 
@@ -72,7 +72,7 @@ functions:
            MONGODB_BINARIES: "$MONGODB_BINARIES"
            UPLOAD_BUCKET: "$UPLOAD_BUCKET"
            PROJECT_DIRECTORY: "$PROJECT_DIRECTORY"
-           PACKAGE_VERSION: "${PACKAGE_VERSION:1}"
+           PACKAGE_VERSION: "$PACKAGE_VERSION"
            PREPARE_SHELL: |
               set -o errexit
               set -o xtrace
@@ -81,7 +81,7 @@ functions:
               export MONGODB_BINARIES="$MONGODB_BINARIES"
               export UPLOAD_BUCKET="$UPLOAD_BUCKET"
               export PROJECT_DIRECTORY="$PROJECT_DIRECTORY"
-              export PACKAGE_VERSION="${PACKAGE_VERSION:1}"
+              export PACKAGE_VERSION="$PACKAGE_VERSION"
 
               export TMPDIR="$MONGO_ORCHESTRATION_HOME/db"
               export PATH="$MONGODB_BINARIES:$PATH"
@@ -1975,10 +1975,6 @@ task_groups:
         vars:
           PACKAGE_VERSION_MATCH: "v[0-9]*.[0-9]*.[0-9]*-dev[0-9]*"
           PACKAGE_VERSION_EXCLUDE: ""
-      - func: prepare-resources
-      - func: windows-fix
-      - func: fix-absolute-paths
-      - func: make-files-executable
       - func: install-dotnet
     tasks:
       - package-pack
