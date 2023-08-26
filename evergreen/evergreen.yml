@@ -64,7 +64,9 @@ functions:
 
            export MONGO_ORCHESTRATION_HOME="$DRIVERS_TOOLS/.evergreen/orchestration"
            export MONGODB_BINARIES="$DRIVERS_TOOLS/mongodb/bin"
-           export UPLOAD_BUCKET="${project}"
+           # revert this change before merging into master
+           # export UPLOAD_BUCKET="${project}"
+           export UPLOAD_BUCKET="dot-net-driver"
            export PROJECT_DIRECTORY="$(pwd)"
 
            cat <<EOT > expansion.yml
