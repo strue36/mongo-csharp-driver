@@ -46,10 +46,10 @@ functions:
               CURRENT_VERSION=latest
            fi
 
-           if [[ -n ${PACKAGE_VERSION_MATCH} ]]; then
-              PACKAGE_VERSION=$(git describe --tags --abbrev=0 --match="${PACKAGE_VERSION_MATCH}" --exclude="${PACKAGE_VERSION_EXCLUDE}")
+           if [[ -n $PACKAGE_VERSION_MATCH ]]; then
+              export PACKAGE_VERSION=$(git describe --tags --abbrev=0 --match="${PACKAGE_VERSION_MATCH}" --exclude="${PACKAGE_VERSION_EXCLUDE}")
               echo ${PACKAGE_VERSION}
-              PACKAGE_VERSION=${PACKAGE_VERSION:1}
+              export PACKAGE_VERSION=${PACKAGE_VERSION:1}
               echo ${PACKAGE_VERSION}
            fi
 
