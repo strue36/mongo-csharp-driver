@@ -51,6 +51,7 @@ functions:
               PACKAGE_VERSION=$(echo $PACKAGE_VERSION | cut -c 2-)
            fi
 
+           export DOTNET_SDK_PATH="$(pwd)/../.dotnet"
            export DRIVERS_TOOLS="$(pwd)/../drivers-tools"
 
            if [ "Windows_NT" = "$OS" ]; then # Magic variable in cygwin
@@ -74,6 +75,7 @@ functions:
            UPLOAD_BUCKET: "$UPLOAD_BUCKET"
            PROJECT_DIRECTORY: "$PROJECT_DIRECTORY"
            PACKAGE_VERSION: "$PACKAGE_VERSION"
+           DOTNET_SDK_PATH: "$DOTNET_SDK_PATH"
            PREPARE_SHELL: |
               set -o errexit
               set -o xtrace
@@ -85,7 +87,7 @@ functions:
               export PACKAGE_VERSION="$PACKAGE_VERSION"
 
               export TMPDIR="$MONGO_ORCHESTRATION_HOME/db"
-              export PATH="$MONGODB_BINARIES:$PATH"
+              export PATH="$DOTNET_SDK_PATH:$MONGODB_BINARIES:$PATH"
               export PROJECT="${project}"
            EOT
            # See what we've done
