@@ -72,7 +72,7 @@ functions:
            MONGODB_BINARIES: "$MONGODB_BINARIES"
            UPLOAD_BUCKET: "$UPLOAD_BUCKET"
            PROJECT_DIRECTORY: "$PROJECT_DIRECTORY"
-           PACKAGE_VERSION: "$PACKAGE_VERSION"
+           PACKAGE_VERSION: "${PACKAGE_VERSION:1}"
            PREPARE_SHELL: |
               set -o errexit
               set -o xtrace
@@ -81,7 +81,7 @@ functions:
               export MONGODB_BINARIES="$MONGODB_BINARIES"
               export UPLOAD_BUCKET="$UPLOAD_BUCKET"
               export PROJECT_DIRECTORY="$PROJECT_DIRECTORY"
-              export PACKAGE_VERSION="$PACKAGE_VERSION"
+              export PACKAGE_VERSION="${PACKAGE_VERSION:1}"
 
               export TMPDIR="$MONGO_ORCHESTRATION_HOME/db"
               export PATH="$MONGODB_BINARIES:$PATH"
@@ -1035,7 +1035,7 @@ functions:
         working_dir: mongo-csharp-driver
         script: |
           ${PREPARE_SHELL}
-          if [ -z ${PACKAGE_VERSION} ]
+          if [[ -z $PACKAGE_VERSION ]]
             exit 1
           fi
           OS=${OS} PACKAGE_VERSION=${PACKAGE_VERSION} sh evergreen/run-pack.sh
@@ -1975,6 +1975,10 @@ task_groups:
         vars:
           PACKAGE_VERSION_MATCH: "v[0-9]*.[0-9]*.[0-9]*-dev[0-9]*"
           PACKAGE_VERSION_EXCLUDE: ""
+      - func: prepare-resources
+      - func: windows-fix
+      - func: fix-absolute-paths
+      - func: make-files-executable
       - func: install-dotnet
     tasks:
       - package-pack
