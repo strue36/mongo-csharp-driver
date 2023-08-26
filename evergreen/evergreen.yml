@@ -46,7 +46,6 @@ functions:
               CURRENT_VERSION=latest
            fi
 
-           echo "$PACKAGE_VERSION_MATCH"
            if [[ -n $PACKAGE_VERSION_MATCH ]]; then
               PACKAGE_VERSION=$(git describe --tags --abbrev=0 --match="$PACKAGE_VERSION_MATCH" --exclude="$PACKAGE_VERSION_EXCLUDE")
               echo $PACKAGE_VERSION
@@ -1975,11 +1974,11 @@ task_groups:
 
   - name: dev-package
     setup_group:
-      - func: install-dotnet
       - func: fetch-source
         vars:
           PACKAGE_VERSION_MATCH: "v[0-9]*.[0-9]*.[0-9]*-dev[0-9]*"
           PACKAGE_VERSION_EXCLUDE: ""
+      - func: install-dotnet
     tasks:
       - package-pack
 
