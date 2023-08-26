@@ -76,7 +76,7 @@ functions:
            MONGODB_BINARIES: "$MONGODB_BINARIES"
            UPLOAD_BUCKET: "$UPLOAD_BUCKET"
            PROJECT_DIRECTORY: "$PROJECT_DIRECTORY"
-           PACKAGE_VERSION="$PACKAGE_VERSION"
+           PACKAGE_VERSION: "$PACKAGE_VERSION"
            PREPARE_SHELL: |
               set -o errexit
               set -o xtrace
