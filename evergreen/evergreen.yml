@@ -1976,6 +1976,7 @@ task_groups:
         vars:
           PACKAGE_VERSION_MATCH: "v[0-9]*.[0-9]*.[0-9]*-dev[0-9]*"
           PACKAGE_VERSION_EXCLUDE: ""
+      - func: make-files-executable
       - func: install-dotnet
     tasks:
       - package-pack
