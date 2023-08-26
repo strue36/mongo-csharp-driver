@@ -48,7 +48,7 @@ functions:
 
            if [ "${PACKAGE_VERSION_MATCH}" != "" ]; then
               PACKAGE_VERSION=$(git describe --tags --abbrev=0 --match="${PACKAGE_VERSION_MATCH}" --exclude="${PACKAGE_VERSION_EXCLUDE}")
-              PACKAGE_VERSION=$(echo ${PACKAGE_VERSION:1})
+              PACKAGE_VERSION=$(echo $PACKAGE_VERSION | cut -c 2-)
            fi
 
            export DRIVERS_TOOLS="$(pwd)/../drivers-tools"
