@@ -1976,6 +1976,7 @@ task_groups:
       - func: prepare-resources
       - func: windows-fix
       - func: fix-absolute-paths
+      - func: make-files-executable
       - func: install-dotnet
     tasks:
       - package-pack
