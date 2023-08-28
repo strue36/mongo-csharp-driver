@@ -47,8 +47,7 @@ functions:
            fi
 
            if [ "${PACKAGE_VERSION_MATCH}" != "" ]; then
-              PACKAGE_VERSION=$(git describe --tags --abbrev=0 --match="${PACKAGE_VERSION_MATCH}" --exclude="${PACKAGE_VERSION_EXCLUDE}")
-              PACKAGE_VERSION=$(echo $PACKAGE_VERSION | cut -c 2-)
+              PACKAGE_VERSION=$(PACKAGE_VERSION_MATCH=$PACKAGE_VERSION_MATCH sh ./evergreen/get-package-version.sh)
            fi
 
            export DOTNET_SDK_PATH="$(pwd)/../.dotnet"
