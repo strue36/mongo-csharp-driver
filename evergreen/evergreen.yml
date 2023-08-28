@@ -47,7 +47,7 @@ functions:
            fi
 
            if [ "${PACKAGE_VERSION_MATCH}" != "" ]; then
-              PACKAGE_VERSION=$(PACKAGE_VERSION_MATCH="${PACKAGE_VERSION_MATCH}" sh ./evergreen/get-package-version.sh)
+              PACKAGE_VERSION=$(PACKAGE_VERSION_MATCH="${PACKAGE_VERSION_MATCH}" sh ./evergreen/packages-version.sh)
            fi
 
            export DOTNET_SDK_PATH="$(pwd)/../.dotnet"
@@ -1031,13 +1031,20 @@ functions:
           echo '{"results": [{ "status": "FAIL", "test_file": "Build", "log_raw": "No test-results.json found was created" } ]}' > ${PROJECT_DIRECTORY}/test-results.json
 
 
-  package-pack:
+  packages-pack:
     - command: shell.exec
       params:
         working_dir: mongo-csharp-driver
         script: |
           ${PREPARE_SHELL}
-          PACKAGE_VERSION="${PACKAGE_VERSION}" sh evergreen/run-pack.sh
+          PACKAGE_VERSION="${PACKAGE_VERSION}" sh evergreen/packages-pack.sh
+
+  packages-push:
+    - command: shell.exec
+      params:
+        working_dir: mongo-csharp-driver
+        script: |
+          PACKAGE_VERSION="${PACKAGE_VERSION}" PACKAGES_SOURCE="$PACKAGES_SOURCE" PACKAGES_SOURCE_KEY="$PACKAGES_SOURCE_KEY" sh evergreen/packages-pack.sh
 
   upload-package:
     - command: s3.put
@@ -1728,9 +1735,9 @@ tasks:
               export GCPKMS_INSTANCENAME=${GCPKMS_INSTANCENAME}
               GCPKMS_CMD="MONGODB_URI='mongodb://localhost:27017' ./evergreen/run-csfle-gcp-tests.sh" $DRIVERS_TOOLS/.evergreen/csfle/gcpkms/run-command.sh
 
-    - name: package-pack
+    - name: packages-pack
       commands:
-      - func: package-pack
+      - func: packages-pack
       - func: upload-package
         vars:
           PACKAGE_ID: "MongoDB.Bson"
@@ -1746,6 +1753,28 @@ tasks:
       - func: upload-package
         vars:
           PACKAGE_ID: "mongocsharpdriver"
+
+    - name: packages-push-github
+      commands:
+        - func: download-package
+          vars:
+            PACKAGE_ID: "MongoDB.Bson"
+        - func: download-package
+          vars:
+            PACKAGE_ID: "MongoDB.Driver"
+        - func: download-package
+          vars:
+            PACKAGE_ID: "MongoDB.Driver.Core"
+        - func: download-package
+          vars:
+            PACKAGE_ID: "MongoDB.Driver.GridFS"
+        - func: download-package
+          vars:
+            PACKAGE_ID: "mongocsharpdriver"
+        - func: packages-push
+          vars:
+            PACKAGES_SOURCE: "github"
+            PACKAGES_SOURCE_KEY: ${github_packages_key}
 
 axes:
   - id: version
@@ -1980,7 +2009,8 @@ task_groups:
       - func: make-files-executable
       - func: install-dotnet
     tasks:
-      - package-pack
+      - packages-pack
+      - packages-push-github
 
 buildvariants:
 
