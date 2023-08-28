@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -o errexit  # Exit the script with error if any of the commands fail
 
-if [ "$PACKAGE_VERSION" == "" ]; then
+if [ -z "$PACKAGE_VERSION" ]; then
   PACKAGE_VERSION=$(sh ./evergreen/get-package-version.sh)
   echo Calculated PACKAGE_VERSION value: "$PACKAGE_VERSION"
 fi
