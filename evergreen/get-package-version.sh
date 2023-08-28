@@ -8,5 +8,5 @@ if [ -z "$PACKAGE_VERSION_MATCH" ]; then
 fi
 
 PACKAGE_VERSION=$(git describe --tags --abbrev=0 --match="${PACKAGE_VERSION_MATCH}" --exclude="${PACKAGE_VERSION_EXCLUDE}")
-PACKAGE_VERSION="${PACKAGE_VERSION:1}"
+PACKAGE_VERSION=$(echo $PACKAGE_VERSION | cut -c 2-)
 echo "$PACKAGE_VERSION"
