@@ -47,7 +47,7 @@ functions:
            fi
 
            if [ "${PACKAGE_VERSION_MATCH}" != "" ]; then
-              PACKAGE_VERSION=$(PACKAGE_VERSION_MATCH=$PACKAGE_VERSION_MATCH sh ./evergreen/get-package-version.sh)
+              PACKAGE_VERSION=$(PACKAGE_VERSION_MATCH="${PACKAGE_VERSION_MATCH}" sh ./evergreen/get-package-version.sh)
            fi
 
            export DOTNET_SDK_PATH="$(pwd)/../.dotnet"
