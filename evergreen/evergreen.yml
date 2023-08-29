@@ -107,14 +107,6 @@ functions:
               export FLE_GCP_PRIVATE_KEY=${FLE_GCP_PRIVATE_KEY}
               set -o xtrace # Enable tracing.
            EOT
-
-           # Add CSFLE variables that shouldn't be output to the logs
-           cat <<EOT >> expansion.yml
-           PREPARE_GITHUB_SECRET: |
-              set +o xtrace # Disable tracing.
-              export PACKAGES_SOURCE_KEY=$
-              set -o xtrace # Enable tracing.
-           EOT
            # Do not output expansion.yml contents after this point
 
     # Load the expansion file to make an evergreen variable with the current unique version
@@ -1052,6 +1044,7 @@ functions:
       params:
         working_dir: mongo-csharp-driver
         script: |
+          export PACKAGES_SOURCE="$PACKAGES_SOURCE"
           ${PREPARE_SHELL}
           . ./evergreen/packages-push.sh
 
