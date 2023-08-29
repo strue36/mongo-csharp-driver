@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 set -o errexit  # Exit the script with error if any of the commands fail
+set +o xtrace # Disable tracing.
 
 if [ -z "$PACKAGES_SOURCE" ]; then
   echo "PACKAGES_SOURCE variable should be set"

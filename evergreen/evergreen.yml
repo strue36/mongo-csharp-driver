@@ -1037,14 +1037,15 @@ functions:
         working_dir: mongo-csharp-driver
         script: |
           ${PREPARE_SHELL}
-          PACKAGE_VERSION="${PACKAGE_VERSION}" sh evergreen/packages-pack.sh
+          sh ./evergreen/packages-pack.sh
 
   packages-push:
     - command: shell.exec
       params:
         working_dir: mongo-csharp-driver
         script: |
-          PACKAGE_VERSION="${PACKAGE_VERSION}" PACKAGES_SOURCE="$PACKAGES_SOURCE" PACKAGES_SOURCE_KEY="$PACKAGES_SOURCE_KEY" sh evergreen/packages-pack.sh
+          ${PREPARE_SHELL}
+          sh ./evergreen/packages-push.sh
 
   upload-package:
     - command: s3.put
