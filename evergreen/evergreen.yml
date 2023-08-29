@@ -1756,7 +1756,7 @@ tasks:
         vars:
           PACKAGE_ID: "mongocsharpdriver"
 
-    - name: packages-push
+    - name: packages-push-github
       commands:
         - func: download-package
           vars:
