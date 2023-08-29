@@ -2,9 +2,6 @@
 set -o errexit  # Exit the script with error if any of the commands fail
 set +o xtrace # Disable tracing.
 
-echo "TEST ENV VAR"
-echo "${PACKAGES_SOURCE}"
-
 if [ -z "$PACKAGES_SOURCE" ]; then
   echo "PACKAGES_SOURCE variable should be set"
   exit 1

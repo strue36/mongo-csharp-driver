@@ -110,14 +110,6 @@ functions:
               set -o xtrace # Enable tracing.
            EOT
 
-           # Add GITHUB variables that shouldn't be output to the logs
-           cat <<EOT >> expansion.yml
-           PREPARE_GITHUB_SECRETS: |
-              set +o xtrace # Disable tracing.
-              export PACKAGES_SOURCE_KEY=${github_packages_key}
-              set -o xtrace # Enable tracing.
-           EOT
-
     # Load the expansion file to make an evergreen variable with the current unique version
     - command: expansions.update
       params:
@@ -1048,15 +1040,13 @@ functions:
           ${PREPARE_SHELL}
           . ./evergreen/packages-pack.sh
 
-  packages-push-github:
+  packages-push:
     - command: shell.exec
       params:
         working_dir: mongo-csharp-driver
         script: |
-          ${PREPARE_GITHUB_SECRETS}
           ${PREPARE_SHELL}
-          export PACKAGES_SOURCE="github"
-          . ./evergreen/packages-push.sh
+          PACKAGES_SOURCE="${PACKAGES_SOURCE}" PACKAGES_SOURCE_KEY="${PACKAGES_SOURCE_KEY}" . ./evergreen/packages-push.sh
 
   upload-package:
     - command: s3.put
@@ -1766,7 +1756,7 @@ tasks:
         vars:
           PACKAGE_ID: "mongocsharpdriver"
 
-    - name: packages-push-github
+    - name: packages-push
       commands:
         - func: download-package
           vars:
@@ -1783,7 +1773,10 @@ tasks:
         - func: download-package
           vars:
             PACKAGE_ID: "mongocsharpdriver"
-        - func: packages-push-github
+        - func: packages-push
+          vars:
+            PACKAGES_SOURCE: "github"
+            PACKAGES_SOURCE_KEY: ${github_packages_key}
 
 axes:
   - id: version
