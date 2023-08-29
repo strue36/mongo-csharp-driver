@@ -1046,7 +1046,7 @@ functions:
         script: |
           ${PREPARE_SHELL}
           set +o xtrace # Disable tracing.
-          PACKAGES_SOURCE="${PACKAGES_SOURCE}" PACKAGES_SOURCE_KEY="${PACKAGES_SOURCE_KEY}" . ./evergreen/packages-push.sh
+          PACKAGES_SOURCE="${PACKAGES_SOURCE}" PACKAGES_SOURCE_KEY="$PACKAGES_SOURCE_KEY" . ./evergreen/packages-push.sh
           set -o xtrace # Enable tracing.
 
   upload-package:
