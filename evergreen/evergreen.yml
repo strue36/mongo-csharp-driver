@@ -94,6 +94,8 @@ functions:
            # See what we've done
            cat expansion.yml
 
+          # Do not output expansion.yml contents after this point
+
            # Add CSFLE variables that shouldn't be output to the logs
            cat <<EOT >> expansion.yml
            PREPARE_CSFLE: |
@@ -107,7 +109,14 @@ functions:
               export FLE_GCP_PRIVATE_KEY=${FLE_GCP_PRIVATE_KEY}
               set -o xtrace # Enable tracing.
            EOT
-           # Do not output expansion.yml contents after this point
+
+          # Add GITHUB variables that shouldn't be output to the logs
+          cat <<EOT >> expansion.yml
+          PREPARE_GITHUB_SECRETS: |
+             set +o xtrace # Disable tracing.
+             export PACKAGES_SOURCE_KEY=${github_packages_key}
+             set -o xtrace # Enable tracing.
+          EOT
 
     # Load the expansion file to make an evergreen variable with the current unique version
     - command: expansions.update
@@ -1039,12 +1048,15 @@ functions:
           ${PREPARE_SHELL}
           . ./evergreen/packages-pack.sh
 
-  packages-push:
+  packages-push-github:
     - command: shell.exec
       params:
         working_dir: mongo-csharp-driver
         script: |
-          PATH="${PATH}" PACKAGE_VERSION="${PACKAGE_VERSION}" PACKAGES_SOURCE="$PACKAGES_SOURCE" PACKAGES_SOURCE_KEY="$PACKAGES_SOURCE_KEY" ./evergreen/packages-push.sh
+          ${PREPARE_GITHUB_SECRETS}
+          ${PREPARE_SHELL}
+          export PACKAGES_SOURCE="github"
+          . ./evergreen/packages-push.sh
 
   upload-package:
     - command: s3.put
@@ -1771,10 +1783,7 @@ tasks:
         - func: download-package
           vars:
             PACKAGE_ID: "mongocsharpdriver"
-        - func: packages-push
-          vars:
-            PACKAGES_SOURCE: "github"
-            PACKAGES_SOURCE_KEY: ${github_packages_key}
+        - func: packages-push-github
 
 axes:
   - id: version
