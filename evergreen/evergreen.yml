@@ -1045,7 +1045,7 @@ functions:
         working_dir: mongo-csharp-driver
         script: |
           ${PREPARE_SHELL}
-          sh ./evergreen/packages-push.sh
+          PACKAGES_SOURCE="$PACKAGES_SOURCE" PACKAGES_SOURCE_KEY="$PACKAGES_SOURCE_KEY" sh ./evergreen/packages-push.sh
 
   upload-package:
     - command: s3.put
