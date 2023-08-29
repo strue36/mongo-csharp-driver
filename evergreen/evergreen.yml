@@ -94,7 +94,7 @@ functions:
            # See what we've done
            cat expansion.yml
 
-          # Do not output expansion.yml contents after this point
+           # Do not output expansion.yml contents after this point
 
            # Add CSFLE variables that shouldn't be output to the logs
            cat <<EOT >> expansion.yml
@@ -110,13 +110,13 @@ functions:
               set -o xtrace # Enable tracing.
            EOT
 
-          # Add GITHUB variables that shouldn't be output to the logs
-          cat <<EOT >> expansion.yml
-          PREPARE_GITHUB_SECRETS: |
-             set +o xtrace # Disable tracing.
-             export PACKAGES_SOURCE_KEY=${github_packages_key}
-             set -o xtrace # Enable tracing.
-          EOT
+           # Add GITHUB variables that shouldn't be output to the logs
+           cat <<EOT >> expansion.yml
+           PREPARE_GITHUB_SECRETS: |
+              set +o xtrace # Disable tracing.
+              export PACKAGES_SOURCE_KEY=${github_packages_key}
+              set -o xtrace # Enable tracing.
+           EOT
 
     # Load the expansion file to make an evergreen variable with the current unique version
     - command: expansions.update
