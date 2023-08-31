@@ -31,10 +31,10 @@ functions:
     - command: git.get_project
       params:
         directory: mongo-csharp-driver
-    # Applies the subitted patch, if any
+    # Applies the submitted patch, if any
     # Deprecated. Should be removed. But still needed for certain agents (ZAP)
     - command: git.apply_patch
-    # Make an evergreen exapanstion file with dynamic values
+    # Make an evergreen expansion file with dynamic values
     - command: shell.exec
       params:
         working_dir: mongo-csharp-driver
@@ -86,7 +86,6 @@ functions:
               export UPLOAD_BUCKET="$UPLOAD_BUCKET"
               export PROJECT_DIRECTORY="$PROJECT_DIRECTORY"
               export PACKAGE_VERSION="$PACKAGE_VERSION"
-              export DOTNET_SDK_PATH="$DOTNET_SDK_PATH"
               export TMPDIR="$MONGO_ORCHESTRATION_HOME/db"
               export PATH="$DOTNET_SDK_PATH:$MONGODB_BINARIES:$PATH"
               export PROJECT="${project}"
@@ -1776,7 +1775,7 @@ tasks:
             PACKAGE_ID: "mongocsharpdriver"
         - func: packages-push
           vars:
-            PACKAGES_SOURCE: "github"
+            PACKAGES_SOURCE: "https://nuget.pkg.github.com/sanych-sun/index.json"
             PACKAGES_SOURCE_KEY: ${github_packages_key}
 
 axes:
