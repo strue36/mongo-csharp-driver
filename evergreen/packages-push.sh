@@ -12,6 +12,11 @@ if [ -z "$PACKAGES_SOURCE_KEY" ]; then
   exit 1
 fi
 
+if [ -z "$PACKAGE_VERSION" ]; then
+  echo "PACKAGE_VERSION variable should be set"
+  exit 1
+fi
+
 dotnet nuget push --source "$PACKAGES_SOURCE" --api-key "$PACKAGES_SOURCE_KEY" ./build/nuget/MongoDB.Bson."$PACKAGE_VERSION".nupkg
 dotnet nuget push --source "$PACKAGES_SOURCE" --api-key "$PACKAGES_SOURCE_KEY" ./build/nuget/MongoDB.Driver.Core."$PACKAGE_VERSION".nupkg
 dotnet nuget push --source "$PACKAGES_SOURCE" --api-key "$PACKAGES_SOURCE_KEY" ./build/nuget/MongoDB.Driver."$PACKAGE_VERSION".nupkg
