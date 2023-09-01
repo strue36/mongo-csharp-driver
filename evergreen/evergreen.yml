@@ -46,8 +46,8 @@ functions:
               CURRENT_VERSION=latest
            fi
 
-           if [ "${PACKAGE_VERSION_MATCH}" != "" ]; then
-              PACKAGE_VERSION=$(PACKAGE_VERSION_MATCH="${PACKAGE_VERSION_MATCH}" PACKAGE_VERSION_EXCLUDE="${PACKAGE_VERSION_EXCLUDE}" sh ./evergreen/packages-version.sh)
+           if [ "${PACKAGE_TARGET}" != "" ]; then
+              PACKAGE_VERSION=$(PACKAGE_TARGET="${PACKAGE_TARGET}" sh ./evergreen/packages-version.sh)
            fi
 
            export DOTNET_SDK_PATH="$(pwd)/../.dotnet"
@@ -2003,8 +2003,7 @@ task_groups:
     setup_task:
       - func: fetch-source
         vars:
-          PACKAGE_VERSION_MATCH: "v[0-9]*.[0-9]*.[0-9]*-dev[0-9]*"
-          PACKAGE_VERSION_EXCLUDE: ""
+          PACKAGE_TARGET: "dev"
       - func: prepare-resources
       - func: fix-absolute-paths
       - func: make-files-executable
