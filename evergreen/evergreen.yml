@@ -1737,7 +1737,7 @@ tasks:
               export GCPKMS_INSTANCENAME=${GCPKMS_INSTANCENAME}
               GCPKMS_CMD="MONGODB_URI='mongodb://localhost:27017' ./evergreen/run-csfle-gcp-tests.sh" $DRIVERS_TOOLS/.evergreen/csfle/gcpkms/run-command.sh
 
-    - name: packages-pack
+    - name: packages-create
       commands:
       - func: packages-pack
       - func: upload-package
@@ -2009,7 +2009,7 @@ task_groups:
       - func: make-files-executable
       - func: install-dotnet
     tasks:
-      - packages-pack
+      - packages-create
       - packages-push-github
 
 buildvariants:
