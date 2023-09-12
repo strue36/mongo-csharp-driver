@@ -16,6 +16,9 @@ command_type: system
 # 60 minutes: 20 minutes is a normal test run + up to 10 minutes for test setup + 15 minutes for longer macOS tests + 15 minutes for longer macOS 1100 tests
 exec_timeout_secs: 3600
 
+# Feature to ensure that env variables does not leak in between functions
+unset_function_vars: true
+
 # What to do when evergreen hits the timeout (`post:` tasks are run automatically)
 timeout:
   - command: shell.exec
