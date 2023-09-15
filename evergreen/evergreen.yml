@@ -16,9 +16,6 @@ command_type: system
 # 60 minutes: 20 minutes is a normal test run + up to 10 minutes for test setup + 15 minutes for longer macOS tests + 15 minutes for longer macOS 1100 tests
 exec_timeout_secs: 3600
 
-# Feature to ensure that env variables does not leak in between functions
-unset_function_vars: true
-
 # What to do when evergreen hits the timeout (`post:` tasks are run automatically)
 timeout:
   - command: shell.exec
@@ -66,7 +63,9 @@ functions:
 
            export MONGO_ORCHESTRATION_HOME="$DRIVERS_TOOLS/.evergreen/orchestration"
            export MONGODB_BINARIES="$DRIVERS_TOOLS/mongodb/bin"
-           export UPLOAD_BUCKET="${project}"
+           # revert this change before merging into master
+           # export UPLOAD_BUCKET="${project}"
+           export UPLOAD_BUCKET="dot-net-driver"
            export PROJECT_DIRECTORY="$(pwd)"
 
            cat <<EOT > expansion.yml
@@ -1776,7 +1775,7 @@ tasks:
             PACKAGE_ID: "mongocsharpdriver"
         - func: packages-push
           vars:
-            PACKAGES_SOURCE: "https://nuget.pkg.github.com/mongodb/index.json"
+            PACKAGES_SOURCE: "https://nuget.pkg.github.com/sanych-sun/index.json"
             PACKAGES_SOURCE_KEY: ${github_packages_key}
 
 axes:
