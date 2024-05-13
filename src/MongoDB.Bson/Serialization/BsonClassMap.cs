@@ -971,8 +971,9 @@ namespace MongoDB.Bson.Serialization
         /// Creates a member map for a member and adds it to the class map.
         /// </summary>
         /// <param name="memberInfo">The member info.</param>
+        /// <param name="expectedType">The expected type that this member belongs to. Will default to the type of the class map.</param>
         /// <returns>The member map (so method calls can be chained).</returns>
-        public BsonMemberMap MapMember(MemberInfo memberInfo)
+        public BsonMemberMap MapMember(MemberInfo memberInfo, Type expectedType = null)
         {
             if (memberInfo == null)
             {
@@ -982,7 +983,7 @@ namespace MongoDB.Bson.Serialization
             {
                 throw new ArgumentException("MemberInfo must be either a FieldInfo or a PropertyInfo.", "memberInfo");
             }
-            EnsureMemberInfoIsForThisClass(memberInfo);
+            EnsureMemberInfoIsForThisClass(memberInfo, expectedType);
 
             if (_frozen) { ThrowFrozenException(); }
             var memberMap = _declaredMemberMaps.Find(m => m.MemberInfo == memberInfo);
@@ -1305,9 +1306,9 @@ namespace MongoDB.Bson.Serialization
             }
         }
 
-        private void EnsureMemberInfoIsForThisClass(MemberInfo memberInfo)
+        private void EnsureMemberInfoIsForThisClass(MemberInfo memberInfo, Type expectedClassType = null)
         {
-            if (memberInfo.DeclaringType != _classType)
+            if (memberInfo.DeclaringType != (expectedClassType ?? _classType))
             {
                 var message = string.Format(
                     "The memberInfo argument must be for class {0}, but was for class {1}.",

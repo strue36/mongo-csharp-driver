@@ -37,6 +37,29 @@ namespace MongoDB.Bson.Tests.Serialization.Conventions
         }
 
         [Fact]
+        public void TestOptsInInterfaceMembers()
+        {
+            var convention = AttributeConventionPack.Instance;
+            var classMap = new BsonClassMap<ITestInterface>();
+            new ConventionRunner(convention).Apply(classMap);
+
+            Assert.Equal(1, classMap.DeclaredMemberMaps.Count());
+            Assert.Equal(nameof(ITestInterface.Foo), classMap.GetMemberMap(nameof(ITestInterface.Foo)).ElementName);
+        }
+
+        [Fact]
+        public void TestOptsInCombinedInterfaceMembers()
+        {
+            var convention = AttributeConventionPack.Instance;
+            var classMap = new BsonClassMap<ITestCombinedInterface>();
+            new ConventionRunner(convention).Apply(classMap);
+
+            Assert.Equal(2, classMap.DeclaredMemberMaps.Count());
+            Assert.Equal(nameof(ITestCombinedInterface.Foo), classMap.GetMemberMap(nameof(ITestCombinedInterface.Foo)).ElementName);
+            Assert.Equal(nameof(ITestCombinedInterface.Bar), classMap.GetMemberMap(nameof(ITestCombinedInterface.Bar)).ElementName);
+        }
+
+        [Fact]
         public void TestThrowsWithDuplicateIds()
         {
             var convention = AttributeConventionPack.Instance;
@@ -66,6 +89,18 @@ namespace MongoDB.Bson.Tests.Serialization.Conventions
                 get { return _firstName; }
                 set { _firstName = value; }
             }
+        }
+
+        private interface ITestInterface
+        {
+            [BsonElement]
+            public string Foo { get; }
+        }
+
+        private interface ITestCombinedInterface : ITestInterface
+        {
+            [BsonElement]
+            public string Bar { get; }
         }
 
         private class TestDuplicateIds

@@ -145,25 +145,31 @@ namespace MongoDB.Bson.Serialization.Conventions
 
             private void OptInMembersWithBsonMemberMapModifierAttribute(BsonClassMap classMap)
             {
+
                 var classTypeInfo = classMap.ClassType.GetTypeInfo();
+                var classTypeInfos = classTypeInfo.IsInterface ? classTypeInfo.GetInterfaces().Select(x => x.GetTypeInfo()).ToList() : new List<TypeInfo>();
+                classTypeInfos.Add(classTypeInfo);
 
-                // let other fields opt-in if they have any IBsonMemberMapAttribute attributes
-                foreach (var fieldInfo in classTypeInfo.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.DeclaredOnly))
+                foreach (var typeInfo in classTypeInfos)
                 {
-                    var hasAttribute = fieldInfo.GetCustomAttributes(inherit: false).OfType<IBsonMemberMapAttribute>().Any();
-                    if (hasAttribute)
+                    // let other fields opt-in if they have any IBsonMemberMapAttribute attributes
+                    foreach (var fieldInfo in typeInfo.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.DeclaredOnly))
                     {
-                        classMap.MapMember(fieldInfo);
+                        var hasAttribute = fieldInfo.GetCustomAttributes(inherit: false).OfType<IBsonMemberMapAttribute>().Any();
+                        if (hasAttribute)
+                        {
+                            classMap.MapMember(fieldInfo, typeInfo);
+                        }
                     }
-                }
 
-                // let other properties opt-in if they have any IBsonMemberMapAttribute attributes
-                foreach (var propertyInfo in classTypeInfo.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.DeclaredOnly))
-                {
-                    var hasAttribute = propertyInfo.GetCustomAttributes(inherit: false).OfType<IBsonMemberMapAttribute>().Any();
-                    if (hasAttribute)
+                    // let other properties opt-in if they have any IBsonMemberMapAttribute attributes
+                    foreach (var propertyInfo in typeInfo.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.DeclaredOnly))
                     {
-                        classMap.MapMember(propertyInfo);
+                        var hasAttribute = propertyInfo.GetCustomAttributes(inherit: false).OfType<IBsonMemberMapAttribute>().Any();
+                        if (hasAttribute)
+                        {
+                            classMap.MapMember(propertyInfo, typeInfo);
+                        }
                     }
                 }
             }
